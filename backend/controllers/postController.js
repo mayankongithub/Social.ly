@@ -58,6 +58,12 @@ export const createPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find();
+        if(!posts){
+            res.status(401).json({
+                success: false,
+                message: "User not present",
+            }); 
+        }
         res.status(200).json({
             success : true,
             message : "Success",
@@ -139,7 +145,3 @@ export const deletePostById = async(req,res) => {
           res.status(500).json({ success: false, message: "Server Error" });
       }
 }
-
-
-
-
