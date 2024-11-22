@@ -96,21 +96,47 @@ export const getPostsById = async (req, res) => {
 
 export const deletePostById = async(req,res) => {
     try {
-        const postId = req.params.id;
-        if(!postId){
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
+        const post_id = req.params.id;
+    
+        if (!post_id) {
+          return res.status(404).json({
+              success: false,
+              message: "User not found",
+          });
         }
-        await Post.findByIdAndDelete(postId);
-
-        res.status(200).json({ 
-            success: true, 
-            message: "Post deleted successfully" 
+    
+        
+        const postExists = await Post.findById(post_id);
+        if (!postExists) {
+          return res.status(404).json({
+              success: false,
+              message: "User not found",
+          });
+        }
+    
+        const deleted_post = await Post.findByIdAndDelete(post_id);
+    
+    
+    
+        const user = req.user;
+    
+        user.posts.forEach((post, index) => {
+          if (post.toString() === post_id) {
+            user.posts.splice(index, 1);
+          }
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Server Error" });
-    }
+    
+        await user.save();
+    
+        res.status(200).json({ 
+          success: true, 
+          message: "Post deleted successfully" 
+      });
+        
+      }
+      catch (error) {
+          console.error(error);
+          res.status(500).json({ success: false, message: "Server Error" });
+      }
 }
+
