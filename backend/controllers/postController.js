@@ -80,6 +80,12 @@ export const getAllPosts = async (req, res) => {
 export const getPostsById = async (req, res) => {
     try {
         const {id} = req.params;
+        if(!id){
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
         const posts = await Post.findById(id);
         if(!posts){
             return res.status(404).json({
